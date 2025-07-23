@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  app:
+    image: ghcr.io/astral-sh/uv:python3.12-bookworm
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=ap-northeast-1
+    network_mode: host
+    command: uv run python app.py --port 7860

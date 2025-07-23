@@ -5,9 +5,13 @@ services:
     working_dir: /workspace
     volumes:
       - ./:/workspace
-    environment:
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_DEFAULT_REGION=ap-northeast-1
-    network_mode: host
+      - ~/.aws:/root/.aws:ro
+    # environment:
+    #   - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    #   - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    #   - AWS_DEFAULT_REGION=ap-northeast-1
+    # network_mode: host
+    ports:
+      - "7864:7860"
+    tty: true
     command: uv run python app.py --port 7860

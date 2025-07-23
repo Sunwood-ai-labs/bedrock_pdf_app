@@ -1,4 +1,16 @@
+<div align="center">
+
+![](header.png)
+
 # 🤖 AWS Bedrock PDF処理アプリ
+
+<p>
+  <img src="https://img.shields.io/badge/Python-3.11-blue?logo=python">
+  <img src="https://img.shields.io/badge/Gradio-5.22.0-orange?logo=gradio">
+  <img src="https://img.shields.io/badge/AWS%20Bedrock-Enabled-yellow?logo=amazon-aws">
+</p>
+
+</div>
 
 AWS BedrockのClaude PDFサポート機能を使用したGradioアプリです。PDFファイルをアップロードしてAIに質問できます。
 
@@ -61,6 +73,9 @@ just fix
 2. 質問を入力（例：「この文書の要約を教えて」）
 3. 「処理開始」をクリック
 4. AI回答を確認
+
+
+![alt text](image.png)
 
 ## ⚠️ 注意事項
 

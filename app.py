@@ -193,8 +193,14 @@ def create_app():
 
 
 if __name__ == "__main__":
+    import argparse
+
     print("🚀 AWS Bedrock PDF Processor を起動中...")
-    
+
+    parser = argparse.ArgumentParser(description="AWS Bedrock PDF Processor")
+    parser.add_argument("--port", type=int, default=None, help="起動するポート番号 (例: 7860)")
+    args = parser.parse_args()
+
     # AWS認証確認
     try:
         session = boto3.Session()
@@ -204,15 +210,18 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"❌ AWS認証エラー: {e}")
         exit(1)
-    
-    # ポート検索・起動
-    port = find_available_port()
-    if not port:
-        print("❌ 利用可能なポートがありません")
-        exit(1)
-    
-    print(f"🌐 ポート {port} で起動中...")
-    
+
+    # ポート決定
+    if args.port:
+        port = args.port
+        print(f"🌐 指定ポート {port} で起動します")
+    else:
+        port = find_available_port()
+        if not port:
+            print("❌ 利用可能なポートがありません")
+            exit(1)
+        print(f"🌐 自動選択ポート {port} で起動します")
+
     app = create_app()
     app.launch(
         server_name="0.0.0.0",

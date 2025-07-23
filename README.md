@@ -37,7 +37,19 @@ export AWS_ACCESS_KEY_ID="your_key"
 export AWS_SECRET_ACCESS_KEY="your_secret"
 
 # 4. アプリ起動
-just start
+just run
+
+# もしくは直接uvで起動
+uv run python app.py
+
+# ポートを指定したい場合
+just run -- --port 8888
+# または
+uv run python app.py --port 8888
+
+# 5. Docker Composeで起動（推奨: AWS認証情報は.envファイルで管理）
+cp .env.example .env  # 認証情報を記入
+docker compose up
 ```
 
 ## 📋 利用可能なコマンド

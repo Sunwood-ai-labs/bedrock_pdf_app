@@ -1,4 +1,16 @@
+<div align="center">
+
+![](header.png)
+
 # 🤖 AWS Bedrock PDF処理アプリ
+
+<p>
+  <img src="https://img.shields.io/badge/Python-3.11-blue?logo=python">
+  <img src="https://img.shields.io/badge/Gradio-5.22.0-orange?logo=gradio">
+  <img src="https://img.shields.io/badge/AWS%20Bedrock-Enabled-yellow?logo=amazon-aws">
+</p>
+
+</div>
 
 AWS BedrockのClaude PDFサポート機能を使用したGradioアプリです。PDFファイルをアップロードしてAIに質問できます。
 
@@ -25,7 +37,19 @@ export AWS_ACCESS_KEY_ID="your_key"
 export AWS_SECRET_ACCESS_KEY="your_secret"
 
 # 4. アプリ起動
-just start
+just run
+
+# もしくは直接uvで起動
+uv run python app.py
+
+# ポートを指定したい場合
+just run -- --port 8888
+# または
+uv run python app.py --port 8888
+
+# 5. Docker Composeで起動（推奨: AWS認証情報は.envファイルで管理）
+cp .env.example .env  # 認証情報を記入
+docker compose up
 ```
 
 ## 📋 利用可能なコマンド
@@ -61,6 +85,9 @@ just fix
 2. 質問を入力（例：「この文書の要約を教えて」）
 3. 「処理開始」をクリック
 4. AI回答を確認
+
+
+![alt text](image.png)
 
 ## ⚠️ 注意事項
 

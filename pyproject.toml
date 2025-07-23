@@ -1,0 +1,37 @@
+[project]
+name = "bedrock-pdf-app"
+version = "0.1.0"
+description = "AWS Bedrock PDF処理Gradioアプリ"
+authors = [
+    {name = "Developer", email = "dev@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "gradio>=5.22.0",
+    "boto3>=1.35.0",
+    "botocore>=1.35.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+include = ["app.py"]

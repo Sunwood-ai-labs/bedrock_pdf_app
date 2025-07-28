@@ -6,6 +6,11 @@ import socket
 import logging
 from botocore.exceptions import ClientError
 
+# タブ機能をインポート
+from tabs.pdf_to_yaml_tab import create_pdf_to_yaml_tab
+from tabs.pdf_to_markdown_tab import create_pdf_to_markdown_tab
+from utils.file_loader import load_ui_text
+
 # ログ設定
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -105,8 +110,8 @@ def find_available_port(start_port=7860, max_port=7870):
     return None
 
 
-def create_app():
-    """Gradioアプリを作成"""
+def create_pdf_qa_tab():
+    """PDF Q&Aタブを作成（元の機能）"""
     processor = BedrockPDFProcessor()
     
     def handle_upload(pdf_file, question):
@@ -125,25 +130,9 @@ def create_app():
         else:
             return f"⚠️ 元の名前: {original}\n✅ 使用される名前: {sanitized}.pdf"
     
-    # カスタムCSS - シンプルで実用的
-    css = """
-    
-    /* ヘッダー */
-    h1 {
-        text-align: center !important;
-    }
-
-    """
-    
-    # Gradioアプリ作成
-    with gr.Blocks(
-        css=css,
-        title="AWS Bedrock PDF Processor",
-        theme=gr.themes.Soft()  # シンプルなベーステーマ
-    ) as app:
-        
-        gr.Markdown("# 🤖 AWS Bedrock PDF Processor")
-        gr.Markdown("Claude Sonnet 4でPDFを分析します")
+    with gr.Column():
+        gr.Markdown("## 📄❓ PDF Q&A")
+        gr.Markdown("PDFファイルをアップロードしてAIに質問できます")
         
         with gr.Row():
             with gr.Column():
@@ -176,18 +165,51 @@ def create_app():
         submit_btn.click(handle_upload, [pdf_input, question_input], output)
         
         # 使用方法
-        with gr.Accordion("📖 使用方法", open=False):
-            gr.Markdown("""
-            ## 使い方
-            1. **PDFファイルをアップロード**
-            2. **質問を入力**
-            3. **分析開始ボタンをクリック**
+        with gr.Accordion("📖 PDF Q&A機能について", open=False):
+            help_text = load_ui_text("pdf_qa_help")
+            gr.Markdown(help_text)
+
+
+def create_app():
+    """Gradioアプリを作成"""
+    # カスタムCSS - シンプルで実用的
+    css = """
+    /* ヘッダー */
+    h1 {
+        text-align: center !important;
+    }
+    
+    /* タブのスタイリング */
+    .tab-nav {
+        margin-bottom: 20px;
+    }
+    """
+    
+    # Gradioアプリ作成
+    with gr.Blocks(
+        css=css,
+        title="AWS Bedrock PDF Processor",
+        theme=gr.themes.Soft()
+    ) as app:
+        
+        gr.Markdown("# 📄 AWS Bedrock PDF Processor")
+        gr.Markdown("Claude Sonnet 4を使用したPDF処理アプリケーション")
+        
+        # タブ機能を追加
+        with gr.Tabs():
+            with gr.Tab("📄❓ PDF Q&A"):
+                create_pdf_qa_tab()
             
-            ## 技術仕様
-            - **リージョン**: ap-northeast-1
-            - **モデル**: Claude Sonnet 4
-            - **機能**: Citations対応、PDF画像認識
-            """)
+            with gr.Tab("📄➡️📋 PDF→YAML変換"):
+                create_pdf_to_yaml_tab()
+            
+            with gr.Tab("📄➡️📝 PDF→マークダウン変換"):
+                create_pdf_to_markdown_tab()
+        
+        # 全体的な情報
+        with gr.Accordion("ℹ️ アプリケーション情報", open=False):
+            app_info = load_ui_text("app_info")
+            gr.Markdown(app_info)
     
     return app
 

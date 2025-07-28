@@ -4,12 +4,17 @@ import json
 import os
 import socket
 import logging
+import time
+import pandas as pd
 from botocore.exceptions import ClientError
 
 # タブ機能をインポート
 from tabs.pdf_to_yaml_tab import create_pdf_to_yaml_tab
 from tabs.pdf_to_markdown_tab import create_pdf_to_markdown_tab
 from utils.file_loader import load_ui_text
+
+# カスタムテーマをインポート
+from theme import create_custom_theme
 
 # ログ設定
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -170,18 +175,38 @@ def create_pdf_qa_tab():
             gr.Markdown(help_text)
 
 
-def create_app():
-    """Gradioアプリを作成"""
-    # カスタムCSS - シンプルで実用的
+def create_comprehensive_demo():
+    """包括的なデモアプリケーションを作成"""
+    theme = create_custom_theme()
+    
+    # サンプルデータ
+    sample_data = pd.DataFrame({
+        "ファイル名": ["document1.pdf", "report2.pdf", "manual3.pdf", "guide4.pdf"],
+        "サイズ": ["2.5MB", "1.8MB", "4.2MB", "3.1MB"],
+        "ページ数": [15, 25, 8, 12],
+        "処理状況": ["完了", "処理中", "待機", "完了"]
+    })
+    
+    # カスタムCSS
     css = """
     /* ヘッダー */
     h1 {
         text-align: center !important;
+        color: #2C3540 !important;
     }
     
     /* タブのスタイリング */
     .tab-nav {
         margin-bottom: 20px;
+    }
+    
+    /* カスタムボタンスタイル */
+    .custom-button {
+        background: linear-gradient(135deg, #F2CA80 0%, #732922 100%) !important;
+        border: none !important;
+        color: #F2E9D8 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(115, 41, 34, 0.3) !important;
     }
     """
     
@@ -189,11 +214,22 @@ def create_app():
     with gr.Blocks(
         css=css,
         title="AWS Bedrock PDF Processor",
-        theme=gr.themes.Soft()
+        theme=theme
     ) as app:
         
-        gr.Markdown("# 📄 AWS Bedrock PDF Processor")
-        gr.Markdown("Claude Sonnet 4を使用したPDF処理アプリケーション")
+        # ヘッダー
+        gr.HTML(f"""
+        <div style='text-align: center; margin-bottom: 2rem; padding: 2rem; 
+                    background: linear-gradient(135deg, #F2CA80 0%, #732922 100%); 
+                    color: #F2E9D8; border-radius: 12px; 
+                    box-shadow: 0 8px 32px rgba(115, 41, 34, 0.3);'>
+            <h1 style='font-size: 3rem; margin-bottom: 0.5rem; 
+                       text-shadow: 2px 2px 4px rgba(44, 53, 64, 0.5); 
+                       color: #F2E9D8;'>📄 AWS Bedrock PDF Processor</h1>
+            <p style='font-size: 1.2rem; margin: 0; opacity: 0.9; 
+                      color: #F2E9D8;'>〜 Claude Sonnet 4を使用したPDF処理アプリケーション 〜</p>
+        </div>
+        """)
         
         # タブ機能を追加
         with gr.Tabs():
@@ -205,6 +241,10 @@ def create_app():
             
             with gr.Tab("📄➡️📝 PDF→マークダウン変換"):
                 create_pdf_to_markdown_tab()
+            
+            # 新しいデモタブを追加
+            with gr.Tab("🎨 テーマデモ"):
+                create_theme_demo_tab(sample_data)
         
         # 全体的な情報
         with gr.Accordion("ℹ️ アプリケーション情報", open=False):
@@ -212,6 +252,176 @@ def create_app():
             gr.Markdown(app_info)
     
     return app
+
+
+def create_theme_demo_tab(sample_data):
+    """テーマデモタブを作成"""
+    with gr.Column():
+        gr.Markdown("## 🎨 カスタムテーマデモ")
+        gr.Markdown("指定されたカラーパレット（#2C3540, #5D6973, #F2CA80, #F2E9D8, #732922）を使用したUIコンポーネント")
+        
+        # カラーパレット表示
+        gr.HTML("""
+        <div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+                    gap: 1rem; margin: 2rem 0;'>
+            <div style='padding: 1.5rem; background: #2C3540; border-radius: 12px; text-align: center;'>
+                <h4 style='color: #F2E9D8; margin-top: 0;'>🌑 ダークグレー</h4>
+                <p style='font-size: 0.9rem; color: #F2E9D8; margin: 0;'>#2C3540</p>
+            </div>
+            <div style='padding: 1.5rem; background: #5D6973; border-radius: 12px; text-align: center;'>
+                <h4 style='color: #F2E9D8; margin-top: 0;'>🌫️ グレー</h4>
+                <p style='font-size: 0.9rem; color: #F2E9D8; margin: 0;'>#5D6973</p>
+            </div>
+            <div style='padding: 1.5rem; background: #F2CA80; border-radius: 12px; text-align: center;'>
+                <h4 style='color: #2C3540; margin-top: 0;'>✨ ゴールド</h4>
+                <p style='font-size: 0.9rem; color: #2C3540; margin: 0;'>#F2CA80</p>
+            </div>
+            <div style='padding: 1.5rem; background: #F2E9D8; border: 2px solid #5D6973; border-radius: 12px; text-align: center;'>
+                <h4 style='color: #2C3540; margin-top: 0;'>🤍 ベージュ</h4>
+                <p style='font-size: 0.9rem; color: #2C3540; margin: 0;'>#F2E9D8</p>
+            </div>
+            <div style='padding: 1.5rem; background: #732922; border-radius: 12px; text-align: center;'>
+                <h4 style='color: #F2E9D8; margin-top: 0;'>🍷 ダークレッド</h4>
+                <p style='font-size: 0.9rem; color: #F2E9D8; margin: 0;'>#732922</p>
+            </div>
+        </div>
+        """)
+        
+        # 基本入力コンポーネント
+        with gr.Row():
+            with gr.Column():
+                gr.Markdown("### 📝 入力コンポーネント")
+                name_input = gr.Textbox(
+                    label="📄 ファイル名", 
+                    placeholder="document.pdf",
+                    info="処理するファイル名を入力"
+                )
+                file_size = gr.Number(
+                    label="📊 ファイルサイズ (MB)",
+                    minimum=0,
+                    maximum=100,
+                    value=2.5
+                )
+                processing_mode = gr.Radio(
+                    choices=["🚀 高速処理", "🎯 精密処理", "⚖️ バランス"],
+                    label="⚙️ 処理モード",
+                    value="⚖️ バランス"
+                )
+                enable_citations = gr.Checkbox(
+                    label="📚 Citations機能を有効にする",
+                    value=True
+                )
+            
+            with gr.Column():
+                gr.Markdown("### 🎛️ 設定オプション")
+                output_format = gr.CheckboxGroup(
+                    choices=["📝 Markdown", "📋 YAML", "📄 JSON", "📊 CSV"],
+                    label="出力形式（複数選択可）",
+                    value=["📝 Markdown"]
+                )
+                region_select = gr.Dropdown(
+                    choices=["ap-northeast-1 (東京)", "us-east-1 (バージニア)", "eu-west-1 (アイルランド)"],
+                    label="🌍 AWSリージョン",
+                    value="ap-northeast-1 (東京)"
+                )
+                quality_level = gr.Slider(
+                    minimum=1,
+                    maximum=10,
+                    value=7,
+                    step=1,
+                    label="🎯 処理品質レベル"
+                )
+        
+        # ボタン群
+        with gr.Row():
+            process_btn = gr.Button("🚀 処理開始", variant="primary", size="lg")
+            clear_btn = gr.Button("🗑️ クリア", variant="secondary")
+            stop_btn = gr.Button("⛔ 停止", variant="stop")
+        
+        # 結果表示
+        with gr.Row():
+            with gr.Column():
+                result_output = gr.Textbox(
+                    label="📤 処理結果",
+                    lines=8,
+                    show_copy_button=True
+                )
+            
+            with gr.Column():
+                # データ表示
+                data_display = gr.DataFrame(
+                    value=sample_data,
+                    label="📊 処理履歴",
+                    interactive=True
+                )
+        
+        # 処理状況表示
+        status_display = gr.Label(
+            value={
+                "処理完了": 0.75,
+                "処理中": 0.15,
+                "待機中": 0.08,
+                "エラー": 0.02
+            },
+            label="📈 システム状況"
+        )
+        
+        # 簡単な処理関数
+        def process_demo(name, size, mode, citations, formats, region, quality):
+            if not name:
+                return "ファイル名を入力してください。"
+            
+            result = f"📄 ファイル: {name}\n"
+            result += f"📊 サイズ: {size}MB\n"
+            result += f"⚙️ モード: {mode}\n"
+            result += f"📚 Citations: {'有効' if citations else '無効'}\n"
+            result += f"📝 出力形式: {', '.join(formats) if formats else '未選択'}\n"
+            result += f"🌍 リージョン: {region}\n"
+            result += f"🎯 品質レベル: {quality}/10\n\n"
+            result += "✅ 処理が完了しました！"
+            
+            return result
+        
+        def clear_inputs():
+            return ["", 2.5, "⚖️ バランス", True, ["📝 Markdown"], "ap-northeast-1 (東京)", 7, ""]
+        
+        # イベント設定
+        process_btn.click(
+            fn=process_demo,
+            inputs=[name_input, file_size, processing_mode, enable_citations, 
+                   output_format, region_select, quality_level],
+            outputs=result_output
+        )
+        
+        clear_btn.click(
+            fn=clear_inputs,
+            outputs=[name_input, file_size, processing_mode, enable_citations,
+                    output_format, region_select, quality_level, result_output]
+        )
+        
+        # テーマ情報
+        with gr.Accordion("🎨 テーマ情報", open=False):
+            gr.Markdown("""
+            ### カスタムテーマの特徴
+            
+            **カラーパレット:**
+            - **#2C3540** - ダークグレー（テキスト、ボーダー）
+            - **#5D6973** - グレー（セカンダリボタン、ボーダー）
+            - **#F2CA80** - ゴールド（アクセント、スライダー）
+            - **#F2E9D8** - ベージュ（背景、ボタンテキスト）
+            - **#732922** - ダークレッド（プライマリボタン）
+            
+            **デザイン原則:**
+            - 温かみのあるベージュ背景で読みやすさを重視
+            - ゴールドのアクセントで高級感を演出
+            - ダークレッドのプライマリボタンで重要なアクションを強調
+            - グレー系の色でバランスの取れた階層構造
+            """)
+
+
+def create_app():
+    """アプリケーションのエントリーポイント"""
+    return create_comprehensive_demo()
 
 
 if __name__ == "__main__":
@@ -244,7 +454,7 @@ if __name__ == "__main__":
             exit(1)
         print(f"🌐 自動選択ポート {port} で起動します")
 
-    app = create_app()
+    app = create_comprehensive_demo()
     app.launch(
         server_name="0.0.0.0",
         server_port=port,
